@@ -3,145 +3,224 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-// Load Cody sprite sheet
+let imagesLoaded = 0;
+
+// Load assets
 const codySprite = new Image();
-codySprite.src = 'assets/images/codysprite.png'; // <- Your uploaded sprite path
-// Load jump sound
+codySprite.src = 'assets/images/codysprite.png';
+codySprite.onload = imageLoaded;
+
+const milkshakeImg = new Image();
+milkshakeImg.src = 'assets/images/milkshake.png';
+milkshakeImg.onload = imageLoaded;
+
+const cloudsImg = new Image();
+cloudsImg.src = 'assets/images/clouds.png';
+// Load drink images
+const sonicDrinkImg = new Image();
+sonicDrinkImg.src = 'assets/images/sonicdrink.png';
+
+const burgerImg = new Image();
+burgerImg.src = 'assets/images/burger.png';
+
+// Load sounds
 const jumpSound = new Audio('assets/sounds/jump.mp3');
 jumpSound.volume = 0.5;
-// Load crash sound
 const crashSound = new Audio('assets/sounds/crash.mp3');
 crashSound.volume = 0.5;
 
-// Cody object
-let cody = {
-    x: 30,
-    y: 210, // move Cody up a little (40px higher)
-    width: 64,
-    height: 96, // same frame height
-    frameX: 0,
-    frameY: 0,
-    vy: 0,
-    jumping: false,
-    frameCount: 0
-  };
-  
+function imageLoaded() {
+  imagesLoaded++;
+  if (imagesLoaded === 2) {
+    gameLoop();
+  }
+}
 
-let obstacles = [];
+// Variables
+let jumpCount = 0;
+let obstaclesDodged = 0;
+let drinks = [];
+let drinksCollected = 0;
+let extraLives = 0;
+let skyX = 0;
+const skySpeed = 0.5;
+let backgroundX = 0;
+const backgroundSpeed = 2;
 let frames = 0;
 let score = 0;
 let gameOver = false;
-
-// Gravity
 const gravity = 1;
 
-// Controls
-document.addEventListener('keydown', function(e) {
-    if (e.code === 'Space' && !cody.jumping) {
-      cody.vy = -15;
-      cody.jumping = true;
-      jumpSound.currentTime = 0; // <<<<< Reset sound to start
-      jumpSound.play(); // << Play jump sound!
-    }
-  });
-  
+let cody = {
+  x: 30,
+  y: 210,
+  width: 64,
+  height: 96,
+  frameX: 0,
+  frameY: 0,
+  vy: 0,
+  jumping: false,
+  frameCount: 0
+};
 
-// Create obstacles
+let obstacles = [];
+
+// Controls
+
+document.addEventListener('keydown', function(e) {
+  if (e.code === 'Space' && !cody.jumping) {
+    cody.vy = -15;
+    cody.jumping = true;
+    jumpSound.currentTime = 0;
+    jumpSound.play();
+    jumpCount++;
+  }
+});
+
+// Create functions
 function createObstacle() {
-  obstacles.push({ x: 300, y: 260, width: 20, height: 40 });
+  obstacles.push({ x: 300, y: 237, width: 20, height: 50 });
+}
+function createDrink() {
+  const type = Math.random() < 0.5 ? 'drink' : 'burger'; // 50% chance
+  drinks.push({ x: 300, y: Math.random() * 50 + 100, width: 30, height: 30, type: type });
 }
 
 // Draw everything
-
 function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-    ctx.drawImage(
-      codySprite,
-      cody.frameX * 66, // source x
-      0,                // source y
-      60,               // source width
-      105,               // source height (grab full Cody body)
-      cody.x,            // destination x
-      cody.y,            // destination y
-      70,                // draw width
-      96                 // draw height
-    );
-  
-    // Draw obstacles
-    ctx.fillStyle = 'red';
-    obstacles.forEach(obs => {
-      ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
-    });
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw sky
+  ctx.fillStyle = '#87CEEB';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(cloudsImg, skyX, 0, 600, 200);
+  ctx.drawImage(cloudsImg, skyX + 600, 0, 600, 200);
+
+  skyX -= skySpeed;
+  if (skyX <= -600) skyX = 0;
+
+  // Draw ground
+  ctx.fillStyle = '#228B22';
+  ctx.fillRect(backgroundX, 270, 600, 50);
+  ctx.fillRect(backgroundX + 600, 270, 600, 50);
+
+  backgroundX -= backgroundSpeed;
+  if (backgroundX <= -600) backgroundX = 0;
+
+
+ // Draw drinks
+drinks.forEach(drink => {
+  if (drink.type === 'drink') {
+    ctx.drawImage(sonicDrinkImg, drink.x, drink.y, drink.width, drink.height);
+  } else {
+    ctx.drawImage(burgerImg, drink.x - 5, drink.y - 5, drink.width + 10, drink.height + 10);
   }
-  
-  
+});
+
   
 
-// Update positions
+  // Draw Cody
+  ctx.drawImage(
+    codySprite,
+    cody.frameX * 66,
+    0,
+    60,
+    105,
+    cody.x,
+    cody.y,
+    70,
+    96
+  );
+
+  // Draw obstacles
+  obstacles.forEach(obs => {
+    ctx.drawImage(milkshakeImg, obs.x, obs.y, obs.width, obs.height);
+  });
+}
+
+// Update everything
 function update() {
   cody.vy += gravity;
   cody.y += cody.vy;
 
-  // Floor collision
-  const groundLevel = 191; // adjust for Cody body
+  const groundLevel = 191;
+  if (cody.y >= groundLevel) {
+    cody.y = groundLevel;
+    cody.vy = 0;
+    cody.jumping = false;
+  }
 
-if (cody.y >= groundLevel) {
-  cody.y = groundLevel;
-  cody.vy = 0;
-  cody.jumping = false;
-}
-
-
-  // Animate Cody (cycle frames)
+  // Animate Cody
   cody.frameCount++;
   if (cody.frameCount % 10 === 0) {
-    cody.frameX = (cody.frameX + 1) % 4; // 4 frames for running
+    cody.frameX = (cody.frameX + 1) % 4;
   }
 
   // Move obstacles
-  obstacles.forEach(obs => {
-    obs.x -= 5;
+  obstacles.forEach(obs => { obs.x -= 5; });
+
+  obstacles.forEach((obs, index) => {
+    if (obs.x + obs.width < 0) {
+      obstaclesDodged++;
+      obstacles.splice(index, 1);
+    }
   });
 
-  // Remove off-screen obstacles
-  obstacles = obstacles.filter(obs => obs.x + obs.width > 0);
+  // Move drinks
+  drinks.forEach(drink => { drink.x -= 3; });
 
-  // Collision detection
-    const codyHitbox = {
-        x: cody.x + 10,
-        y: cody.y + 10,
-        width: 50, // update this
-        height: 80 // update this
-      };
-      
-      obstacles.forEach(obs => {
-        if (
-          codyHitbox.x < obs.x + obs.width &&
-          codyHitbox.x + codyHitbox.width > obs.x &&
-          codyHitbox.y < obs.y + obs.height &&
-          codyHitbox.y + codyHitbox.height > obs.y
-        ) {
-          endGame();
-        }
-      });
-      
+  // Check drink collection
+  drinks.forEach((drink, index) => {
+    if (
+      cody.x < drink.x + drink.width &&
+      cody.x + cody.width > drink.x &&
+      cody.y < drink.y + drink.height &&
+      cody.y + cody.height > drink.y
+    ) {
+      drinksCollected++;
+      drinks.splice(index, 1);
 
-  // Every 90 frames (~1.5s) create new obstacle
-  if (frames % 90 === 0) {
-    createObstacle();
-  }
+      if (drinksCollected >= 100) {
+        extraLives++;
+        drinksCollected = 0;
+        console.log("🎉 Extra Life Earned! Total Extra Lives: " + extraLives);
+      }
+    }
+  });
 
-  // Update score
+  // Remove offscreen drinks
+  drinks = drinks.filter(drink => drink.x + drink.width > 0);
+
+  // Spawn drinks and obstacles
+  if (frames % 90 === 0) createObstacle();
+  if (frames % 120 === 0) createDrink();
+
   if (!gameOver) {
     frames++;
-    if (frames % 60 === 0) {
-      score++;
-    }
+    if (frames % 60 === 0) score++;
   }
+
+  // Collision detection
+  const codyHitbox = {
+    x: cody.x + 10,
+    y: cody.y + 10,
+    width: 50,
+    height: 80
+  };
+
+  obstacles.forEach(obs => {
+    if (
+      codyHitbox.x < obs.x + obs.width &&
+      codyHitbox.x + codyHitbox.width > obs.x &&
+      codyHitbox.y < obs.y + obs.height &&
+      codyHitbox.y + codyHitbox.height > obs.y
+    ) {
+      endGame();
+    }
+  });
 }
 
-// Game Loop
+// Game loop
 function gameLoop() {
   if (!gameOver) {
     update();
@@ -150,10 +229,9 @@ function gameLoop() {
   }
 }
 
-// End Game
 function endGame() {
   gameOver = true;
-  crashSound.play(); // <<<<< Play crash sound!
+  crashSound.play();
   document.getElementById('gameMessage').textContent = `Game Over! Score: ${score}`;
 
   if (score >= 10) {
@@ -165,12 +243,6 @@ function endGame() {
   }
 }
 
-// Go back to Cody Pet
 function goHome() {
   window.location.href = "index.html";
 }
-
-// Start game after sprite loads
-codySprite.onload = function() {
-  gameLoop();
-};
