@@ -1,0 +1,31 @@
+<!-- File: index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cody Virtual Pet</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="device">
+    <div class="screen">
+      <img id="codyImage" src="assets/images/default.png" alt="Cody" />
+      <div id="responseText">Cody is chilling...</div>
+      
+      <!-- Happiness Bar -->
+      <div id="happinessContainer">
+        <label>Happiness:</label>
+        <progress id="happinessBar" value="50" max="100"></progress>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button onclick="feedCody()">Feed</button>
+      <button onclick="giveDrink()">Drink</button>
+      <button onclick="goToInteract()">Interact</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!-- File: interact.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Interact with Cody</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="device">
+    <div class="screen">
+      <img id="codyImage" src="assets/images/default.png" alt="Cody" />
+      <div id="responseText">Cody is chilling...</div>
+    </div>
+
+    <div class="buttons" id="buttonsContainer">
+      <!-- Buttons will be inserted here dynamically -->
+    </div>
+
+    <div class="nav-buttons">
+        <button onclick="prevPage()">⬅ Back</button>
+        <span id="pageIndicator">Page 1/5</span>
+        <button onclick="nextPage()">Next ➡</button>
+      </div>
+      
+  </div>
+
+  <script src="interact.js"></script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+/* File: style.css */
+body {
+    background-color: #d6d3d1;
+    font-family: 'Courier New', Courier, monospace;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+  }
+  
+  .device {
+    width: 300px;
+    height: 500px;
+    background-color: #ececec;
+    border: 8px solid #333;
+    border-radius: 30px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+  }
+  
+  .screen {
+    width: 100%;
+    height: 300px;
+    background-color: #b8e0d2;
+    border: 4px inset #aaa;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .screen img {
+    width: 150px;
+    margin-top: 20px;
+  }
+  
+  #responseText {
+    margin-top: 10px;
+    font-size: 18px;
+    color: #333;
+  }
+  
+  .buttons button {
+    display: block;
+    width: 80%;
+    margin: 10px auto;
+    padding: 10px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    background-color: #6fcf97;
+    cursor: pointer;
+  }
+  
+  .buttons button:hover {
+    background-color: #56b285;
+  }
+  /* Add at bottom of style.css */
+
+@keyframes shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(3px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(3px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(1px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+  }
+  
+  .shake {
+    animation: shake 0.5s;
+    animation-iteration-count: 10;
+  }
+  
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 
+    40% {transform: translateY(-20px);} 
+    60% {transform: translateY(-10px);}
+  }
+  
+  .bounce {
+    animation: bounce 1s infinite;
+  }
+  /* For smooth page transitions */
+#buttonsContainer {
+    transition: all 0.4s ease;
+  }
+  #happinessContainer {
+    margin-top: 10px;
+  }
+  
+  #happinessBar {
+    width: 80%;
+    height: 20px;
+    margin-top: 5px;
+  }
+  #gameCanvas {
+    background-color: #b8e0d2;
+    border: 3px solid #333;
+    margin-top: 10px;
+  }
+  #gameMessage {
+    font-size: 18px;
+    margin-top: 10px;
+  }
+  
