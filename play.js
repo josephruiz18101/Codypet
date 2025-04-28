@@ -81,24 +81,34 @@ let obstacles = [];
 
 // Controls
 
-document.addEventListener('keydown', function(e) {
-  if (e.code === 'Space') {
-    if (!gameStarted) {
-      gameStarted = true;
-      bgMusic.play(); // Play background music at start
-    } else if (!cody.jumping && !gameOver) {
-      cody.vy = -15;
-      cody.jumping = true;
-      jumpSound.currentTime = 0;
-      jumpSound.play();
-      jumpCount++;
+// Helper function to handle jump
+function tryJump() {
+  if (!gameStarted) {
+    gameStarted = true;
+    if (bgMusic.paused) {
+      bgMusic.play(); // Play music only once at start
+    }
+  } else if (!cody.jumping && !gameOver) {
+    cody.vy = -15;
+    cody.jumping = true;
+    jumpSound.currentTime = 0;
+    jumpSound.play();
+    jumpCount++;
   }
 }
-  // Start music only once when player presses space first time
-  if (bgMusic.paused && !gameOver) {
-    bgMusic.play();
+
+// Spacebar for desktop
+document.addEventListener('keydown', function(e) {
+  if (e.code === 'Space') {
+    tryJump();
   }
 });
+
+// Touch for mobile
+document.addEventListener('touchstart', function(e) {
+  tryJump();
+});
+
 
 // Create functions
 function createObstacle() {
