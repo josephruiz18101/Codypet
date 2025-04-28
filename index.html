@@ -11,19 +11,33 @@
     <div class="screen">
       <img id="codyImage" src="assets/images/default.png" alt="Cody" />
       <div id="responseText">Cody is chilling...</div>
-      
+
       <!-- Happiness Bar -->
       <div id="happinessContainer">
         <label>Happiness:</label>
         <progress id="happinessBar" value="50" max="100"></progress>
+        <div id="levelDisplay">Level: 1 (XP: 0/100)</div>
       </div>
+      <div id="xpContainer">
+        <label>XP:</label>
+        <progress id="xpBar" value="0" max="100"></progress>
+      </div>
+      
     </div>
 
     <div class="buttons">
       <button onclick="feedCody()">Feed</button>
       <button onclick="giveDrink()">Drink</button>
       <button onclick="goToInteract()">Interact</button>
+      <button onclick="goToAchievements()">Achievements</button>
+      <button onclick="toggleRoastMode()">🔥 Roast Mode</button> <!-- New button -->
     </div>
+<!-- Achievements List -->
+<div id="achievementList" style="display: none; max-height: 400px; overflow-y: auto; margin-top: 20px; padding: 10px; border: 2px solid #ccc; border-radius: 10px;">
+  <!-- Achievements will be filled dynamically -->
+</div>
+
+    <div id="popupAchievement" style="display:none;">🏆 Achievement Unlocked!</div>
   </div>
 
   <script src="script.js"></script>

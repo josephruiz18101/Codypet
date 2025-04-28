@@ -4,6 +4,7 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
 let imagesLoaded = 0;
+let gameStarted = false;
 
 // Load assets
 const codySprite = new Image();
@@ -16,25 +17,38 @@ milkshakeImg.onload = imageLoaded;
 
 const cloudsImg = new Image();
 cloudsImg.src = 'assets/images/clouds.png';
-// Load drink images
+cloudsImg.onload = imageLoaded;
+
 const sonicDrinkImg = new Image();
 sonicDrinkImg.src = 'assets/images/sonicdrink.png';
+sonicDrinkImg.onload = imageLoaded;
 
 const burgerImg = new Image();
 burgerImg.src = 'assets/images/burger.png';
+burgerImg.onload = imageLoaded;
 
 // Load sounds
 const jumpSound = new Audio('assets/sounds/jump.mp3');
 jumpSound.volume = 0.5;
 const crashSound = new Audio('assets/sounds/crash.mp3');
 crashSound.volume = 0.5;
+// Load background music
+const bgMusic = new Audio('assets/sounds/music.mp3');
+bgMusic.volume = 0.5;
+bgMusic.loop = true;
 
 function imageLoaded() {
   imagesLoaded++;
-  if (imagesLoaded === 2) {
+  if (imagesLoaded === 5) {
     gameLoop();
   }
 }
+let achievements = {
+  speedDemon: false,
+  jumpMaster: false,
+  obstacleDodger: false,
+  unstoppable: false
+};
 
 // Variables
 let jumpCount = 0;
@@ -68,12 +82,21 @@ let obstacles = [];
 // Controls
 
 document.addEventListener('keydown', function(e) {
-  if (e.code === 'Space' && !cody.jumping) {
-    cody.vy = -15;
-    cody.jumping = true;
-    jumpSound.currentTime = 0;
-    jumpSound.play();
-    jumpCount++;
+  if (e.code === 'Space') {
+    if (!gameStarted) {
+      gameStarted = true;
+      bgMusic.play(); // Play background music at start
+    } else if (!cody.jumping && !gameOver) {
+      cody.vy = -15;
+      cody.jumping = true;
+      jumpSound.currentTime = 0;
+      jumpSound.play();
+      jumpCount++;
+  }
+}
+  // Start music only once when player presses space first time
+  if (bgMusic.paused && !gameOver) {
+    bgMusic.play();
   }
 });
 
@@ -136,10 +159,16 @@ drinks.forEach(drink => {
   obstacles.forEach(obs => {
     ctx.drawImage(milkshakeImg, obs.x, obs.y, obs.width, obs.height);
   });
+  if (!gameStarted) {
+    ctx.fillStyle = "black";
+    ctx.font = "20px Courier New";
+    ctx.fillText("Press SPACE to Start", 50, 150);
+  }
 }
 
 // Update everything
 function update() {
+  if (!gameStarted) return; // <<< Do nothing if game not started
   cody.vy += gravity;
   cody.y += cody.vy;
 
@@ -219,6 +248,37 @@ function update() {
     }
   });
 }
+function checkAchievements() {
+  if (!achievements.speedDemon && score >= 20) {
+    achievements.speedDemon = true;
+    alert("🏆 Achievement Unlocked: Speed Demon!");
+  }
+
+  if (!achievements.jumpMaster && jumpCount >= 50) {
+    achievements.jumpMaster = true;
+    alert("🏆 Achievement Unlocked: Jump Master!");
+  }
+
+  if (!achievements.obstacleDodger && obstaclesDodged >= 10) {
+    achievements.obstacleDodger = true;
+    alert("🏆 Achievement Unlocked: Obstacle Dodger!");
+  }
+
+  if (!achievements.unstoppable && score >= 30) {
+    achievements.unstoppable = true;
+    alert("🏆 Achievement Unlocked: Unstoppable!");
+  }
+
+  saveAchievements();
+}
+function saveAchievements() {
+  localStorage.setItem('codyAchievements', JSON.stringify(achievements));
+}
+
+function loadAchievements() {
+  const saved = JSON.parse(localStorage.getItem('codyAchievements'));
+  if (saved) achievements = saved;
+}
 
 // Game loop
 function gameLoop() {
@@ -232,7 +292,13 @@ function gameLoop() {
 function endGame() {
   gameOver = true;
   crashSound.play();
+  bgMusic.pause();
   document.getElementById('gameMessage').textContent = `Game Over! Score: ${score}`;
+  
+  // Show Restart button
+  document.getElementById('restartButton').style.display = 'inline-block';
+
+  checkAchievements();
 
   if (score >= 10) {
     let happiness = parseInt(localStorage.getItem('happiness')) || 50;
@@ -243,6 +309,12 @@ function endGame() {
   }
 }
 
-function goHome() {
+loadAchievements();
+function restartGame() {
+  window.location.reload();
+}
+
+function goHome()
+ {
   window.location.href = "index.html";
 }
